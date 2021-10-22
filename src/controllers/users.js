@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt'
 import connection from '../database/database.js'
-import { validateUser } from '../validation/validation.js'
+import { validateSignUp, validateSignIn } from '../validation/validation.js'
 
 async function postSignUp (req, res){
-    if(validateUser(req.body)) return res.sendStatus(400)
+    if(validateSignUp(req.body)) return res.sendStatus(400)
     const {
         name,
         email,
@@ -25,6 +25,28 @@ async function postSignUp (req, res){
     }
 }
 
+async function postSignIn (req, res){
+    if(validateSignIn(req.body)) return res.sendStatus(400)
+    const {
+        email,
+        password
+    } = req.body
+    try {
+        const result = await connection.query(`SELECT * FROM users WHERE email = $1;`, [email])
+        const user = result.rows[0]
+        if (user && bcrypt.compareSync(password, user.password)){
+            res.sendStatus(200)
+        } else{
+            res.sendStatus(404)
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+
 export {
-    postSignUp
+    postSignUp,
+    postSignIn
 }
