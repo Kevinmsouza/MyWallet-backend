@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import connection from '../database/database.js'
+import { v4 as uuid } from 'uuid';
 import { validateSignUp, validateSignIn } from '../validation/validation.js'
 
 async function postSignUp (req, res){
@@ -32,10 +33,25 @@ async function postSignIn (req, res){
         password
     } = req.body
     try {
-        const result = await connection.query(`SELECT * FROM users WHERE email = $1;`, [email])
-        const user = result.rows[0]
+        const result = await connection.query(`SELECT * FROM users WHERE email = $1;`, [email]);
+        const user = result.rows[0];
         if (user && bcrypt.compareSync(password, user.password)){
-            res.sendStatus(200)
+            const token = uuid();
+            const checkSessions = await connection.query(`
+                SELECT * FROM sessions 
+                WHERE userid = $1;
+            `, [user.id])
+            if(checkSessions.rows.length)
+                await connection.query(`DELETE FROM sessions WHERE userid = $1;`, [user.id])
+            await connection.query(`
+                INSERT INTO sessions
+                    (token, userid)
+                VALUES ($1, $2);
+                `, [token, user.id]);
+            res.send({
+                name: user.name,
+                token,
+            })
         } else{
             res.sendStatus(404)
         }
