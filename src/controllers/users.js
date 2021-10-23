@@ -62,7 +62,22 @@ async function postSignIn (req, res){
     }
 }
 
+async function postLogout (req, res){
+    const userToken = req.headers.authorization?.replace('Bearer ', '')
+    if(!userToken) return res.sendStatus(400)
+    try {
+        const checkSession = await connection.query('SELECT * FROM sessions WHERE token = $1', [userToken])
+        if(!checkSession.rows.length) return res.sendStatus(404)
+        await connection.query('DELETE FROM sessions WHERE token = $1', [userToken])
+        res.sendStatus(200)
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+
 export {
     postSignUp,
-    postSignIn
+    postSignIn,
+    postLogout
 }
