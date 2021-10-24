@@ -61,8 +61,32 @@ async function putEditOperation(req, res){
     }
 }
 
+async function deleteOperation(req, res){
+    const { id } = req.params
+    if(!id) return res.sendStatus(400)
+    const userToken = req.headers.authorization?.replace('Bearer ', '');
+    if(!userToken) return res.sendStatus(401);
+    try {
+        const checkOperation = await connection.query(`SELECT * FROM operations WHERE id = $1;`, [id])
+        if(!checkOperation.rows.length) return res.sendStatus(404)
+        const checkSession = await connection.query(`SELECT * FROM sessions WHERE token = $1;`, [userToken]);
+        if(!checkSession.rows.length || checkOperation.rows[0].userid !== checkSession.rows[0].userid)
+            return res.sendStatus(403);
+        const { value, description } = req.body;
+        await connection.query(`
+            DELETE FROM operations
+            WHERE id = $1
+        ;`, [id]);
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+}
+
 export {
     getOperations,
     postAddOperation,
-    putEditOperation
+    putEditOperation,
+    deleteOperation
 }

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { postLogout, postSignIn, postSignUp } from './controllers/users.js';
-import { getOperations, postAddOperation, putEditOperation } from './controllers/operations.js';
+import { deleteOperation, getOperations, postAddOperation, putEditOperation } from './controllers/operations.js';
 
 const app = express();
 
@@ -19,6 +19,7 @@ app.post('/logout', postLogout)
 app.get('/operations', getOperations)
 app.post('/operations', postAddOperation)
 app.put('/operations/:id', putEditOperation)
+app.delete('/operations/:id', deleteOperation)
 
 app.listen(4000)
 console.log('Listening to 4000...')
