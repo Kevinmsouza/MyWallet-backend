@@ -67,7 +67,7 @@ async function postLogout (req, res){
     if(!userToken) return res.sendStatus(400)
     try {
         const checkSession = await connection.query('SELECT * FROM sessions WHERE token = $1', [userToken])
-        if(!checkSession.rows.length) return res.sendStatus(404)
+        if(!checkSession.rows.length) return res.sendStatus(403)
         await connection.query('DELETE FROM sessions WHERE token = $1', [userToken])
         res.sendStatus(200)
     } catch (error) {
