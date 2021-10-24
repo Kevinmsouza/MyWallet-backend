@@ -21,5 +21,4 @@ app.post('/operations', postAddOperation)
 app.put('/operations/:id', putEditOperation)
 app.delete('/operations/:id', deleteOperation)
 
-app.listen(4000)
-console.log('Listening to 4000...')
+export default app;
