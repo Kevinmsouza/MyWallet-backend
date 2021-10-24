@@ -24,7 +24,7 @@ describe("PUT /operations", () => {
 
     it("returns 400 for invalid body", async () => {
         const result = await supertest(app)
-            .put(`/operations/7`)
+            .put(`/operations/${putId}`)
             .set('Authorization', token)
             .send({
                 description: "Teste automatizado"
@@ -34,7 +34,7 @@ describe("PUT /operations", () => {
 
     it("returns 401 for unauthenticated", async () => {
         const result = await supertest(app)
-            .put(`/operations/7`)
+            .put(`/operations/${putId}`)
             .send({
                 value: 1,
                 description: "Teste automatizado"
@@ -66,7 +66,7 @@ describe("PUT /operations", () => {
 
     it("returns 200 for success", async () => {
         const result = await supertest(app)
-            .put(`/operations/7`)
+            .put(`/operations/${putId}`)
             .set('Authorization', token)
             .send({
                 value: 1,
