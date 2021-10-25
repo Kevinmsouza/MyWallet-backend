@@ -1,4 +1,3 @@
-import e from 'express';
 import connection from '../database/database.js'
 import { validateAddOperation } from '../validation/validation.js'
 
@@ -9,7 +8,11 @@ async function getOperations (req, res) {
         const checkSession = await connection.query(`SELECT * FROM sessions WHERE token = $1;`, [userToken]);
         if(!checkSession.rows.length) return res.sendStatus(403);
         const { userid } = checkSession.rows[0];
-        const result = await connection.query(`SELECT * FROM operations WHERE userid = $1;`, [userid])
+        const result = await connection.query(`
+            SELECT * FROM operations
+            WHERE userid = $1 
+            LIMIT 1000
+            ;`, [userid])
         result.rows.forEach(operation => delete operation.userid)
         res.send(result.rows)
     } catch (error) {
