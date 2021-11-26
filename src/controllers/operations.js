@@ -13,12 +13,13 @@ async function getOperations(req, res) {
             WHERE userid = $1 
             LIMIT 1000
             ;`, [userid]);
+        // eslint-disable-next-line no-param-reassign
         result.rows.forEach((operation) => delete operation.userid);
-        res.send(result.rows);
+        return res.send(result.rows);
     } catch (error) {
         // eslint-disable-next-line no-console
         console.log(error);
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 }
 
@@ -83,15 +84,19 @@ async function deleteOperation(req, res) {
         const checkOperation = await connection.query('SELECT * FROM operations WHERE id = $1;', [id]);
         if (!checkOperation.rows.length) return res.sendStatus(404);
         const checkSession = await connection.query('SELECT * FROM sessions WHERE token = $1;', [userToken]);
-        if (!checkSession.rows.length || checkOperation.rows[0].userid !== checkSession.rows[0].userid) { return res.sendStatus(403); }
+        const session = checkSession.rows;
+        if (!session.length || checkOperation.rows[0].userid !== session[0].userid) {
+            return res.sendStatus(403);
+        }
         await connection.query(`
             DELETE FROM operations
             WHERE id = $1
         ;`, [id]);
-        res.sendStatus(200);
+        return res.sendStatus(200);
     } catch (error) {
+        // eslint-disable-next-line no-console
         console.log(error);
-        res.sendStatus(500);
+        return res.sendStatus(500);
     }
 }
 
