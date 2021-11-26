@@ -1,77 +1,49 @@
-import app from '../src/app.js';
+/* eslint-disable no-undef */
+import '../src/setup.js';
 import supertest from 'supertest';
+import { v4 as uuid } from 'uuid';
+import app from '../src/app.js';
+import connection from '../src/database/database.js';
+import createUser from './factories/user.factory.js';
 
-const token = "Bearer f634d51e-ea54-42a6-84e1-51f7dfad66d1"
-const putId = 7
+let user;
+const token = uuid();
 
-describe("PUT /operations", () => {
+const validBody = { value: 1, description: 'Teste automatizado' };
 
-    it("returns 400 for id is not a number", async () => {
+beforeAll(async () => {
+    user = createUser();
+    await connection.query('INSERT INTO sessions (userid, token) values ($1, $2);', [user.id, token]);
+});
+
+afterAll(async () => {
+    await connection.query('TRUNCATE users CASCADE;');
+    connection.end();
+});
+
+describe('POST /operations', () => {
+    it('returns 400 for invalid body', async () => {
         const result = await supertest(app)
-            .put("/operations/k")
-            .set('Authorization', token)
-            .send({value: 1, description: "Teste automatizado"})
-        expect(result.status).toEqual(400)
-    })
-
-    it("returns 400 for id is not a positive integer", async () => {
-        const result = await supertest(app)
-            .put("/operations/-1")
-            .set('Authorization', token)
-            .send({value: 1, description: "Teste automatizado"})
-        expect(result.status).toEqual(400)
-    })
-
-    it("returns 400 for invalid body", async () => {
-        const result = await supertest(app)
-            .put(`/operations/${putId}`)
-            .set('Authorization', token)
-            .send({
-                description: "Teste automatizado"
-            })
-        expect(result.status).toEqual(400)
-    })
-
-    it("returns 401 for unauthenticated", async () => {
-        const result = await supertest(app)
-            .put(`/operations/${putId}`)
-            .send({
-                value: 1,
-                description: "Teste automatizado"
-            })
-        expect(result.status).toEqual(401)
-    })
-
-    it("returns 404 for operation does not exist", async () => {
-        const result = await supertest(app)
-            .put(`/operations/1`)
+            .post('/operations')
             .set('Authorization', token)
             .send({
-                value: 1,
-                description: "Teste automatizado"
-            })
-        expect(result.status).toEqual(404)
-    })
+                description: 'Teste automatizado',
+            });
+        expect(result.status).toEqual(400);
+    });
 
-    it("returns 403 for operation of other user", async () => {
+    it('returns 401 for unauthenticated', async () => {
         const result = await supertest(app)
-            .put(`/operations/8`)
-            .set('Authorization', token)
-            .send({
-                value: 1,
-                description: "Teste automatizado"
-            })
-        expect(result.status).toEqual(403)
-    })
+            .post('/operations')
+            .send(validBody);
+        expect(result.status).toEqual(401);
+    });
 
-    it("returns 200 for success", async () => {
+    it('returns 200 for success', async () => {
         const result = await supertest(app)
-            .put(`/operations/${putId}`)
+            .post('/operations')
             .set('Authorization', token)
-            .send({
-                value: 1,
-                description: "Teste automatizado"
-            })
-        expect(result.status).toEqual(200)
-    })
+            .send(validBody);
+        expect(result.status).toEqual(200);
+    });
 });
