@@ -1,6 +1,6 @@
-import joi from "joi";
+import joi from 'joi';
 
-function validateSignUp (user){
+function validateSignUp(user) {
     const singUpSchema = joi.object({
         name: joi.string()
             .min(3)
@@ -11,24 +11,24 @@ function validateSignUp (user){
             .required(),
         password: joi.string()
             .min(6)
-            .required()
-    })
-    return !!singUpSchema.validate(user).error
+            .required(),
+    });
+    return !!singUpSchema.validate(user).error;
 }
 
-function validateSignIn (user){
+function validateSignIn(user) {
     const singInSchema = joi.object({
         email: joi.string()
             .email()
             .required(),
         password: joi.string()
             .min(6)
-            .required()
-    })
-    return !!singInSchema.validate(user).error
+            .required(),
+    });
+    return !!singInSchema.validate(user).error;
 }
 
-function validateAddOperation (operation){
+function validateAddOperation(operation) {
     const operationSchema = joi.object({
         value: joi.number()
             .integer()
@@ -36,13 +36,13 @@ function validateAddOperation (operation){
             .required(),
         description: joi.string()
             .min(2)
-            .required()
-    })
-    return !!operationSchema.validate(operation).error
+            .required(),
+    });
+    return !!operationSchema.validate(operation).error;
 }
 
 export {
     validateSignUp,
     validateSignIn,
-    validateAddOperation
-}
+    validateAddOperation,
+};
