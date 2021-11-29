@@ -150,37 +150,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Data for Name: operations; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.operations (id, date, value, description, userid) FROM stdin;
-5	2021-10-23	530000	Salario	2
-4	2021-10-23	-5000	Mensalidade boardgames	2
-8	2021-10-24	1	Teste automatizado	1
-7	2021-10-24	1	Teste automatizado	2
-\.
-
-
---
--- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.sessions (id, token, userid) FROM stdin;
-6	f634d51e-ea54-42a6-84e1-51f7dfad66d1	2
-\.
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.users (id, name, email, password) FROM stdin;
-1	Kevin Marques	kevinm.souza@hotmail.com	$2b$10$bIXqspGyy1Mo5500gTfb5.PaFqQrPr.z5Fl/G54GRzTsnGeELmj2C
-2	Teste	teste@teste.com	$2b$10$aklX.y1BKpvs9BxxpaECFuvouHdyY4VXaP2m1GTJAgINWvYiulQqq
-\.
-
-
---
 -- Name: operations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
